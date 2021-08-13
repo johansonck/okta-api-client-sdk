@@ -6,6 +6,7 @@ import com.okta.sdk.client.AuthorizationMode;
 import com.okta.sdk.client.Client;
 import com.okta.sdk.client.Clients;
 import com.okta.sdk.resource.user.User;
+import com.okta.sdk.resource.user.UserBuilder;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.Set;
@@ -36,6 +37,14 @@ public class SdkApplication implements ApplicationRunner {
     Client client = getClientWithOAuth(args);
 
     client.listUsers().forEach(user -> logger.info(toString(user)));
+
+    User user = UserBuilder.instance()
+        .setEmail("firstname.lastname@company.com")
+        .setFirstName("Firstname")
+        .setLastName("Lastname")
+        .buildAndCreate(client);
+
+    logger.info(toString(user));
   }
 
   private Client getClientWithApiToken(ApplicationArguments args) {
@@ -65,7 +74,7 @@ public class SdkApplication implements ApplicationRunner {
         .setOrgUrl("https://" + oktaDomain)
         .setAuthorizationMode(AuthorizationMode.PRIVATE_KEY)
         .setClientId(clientId)
-        .setScopes(Set.of("okta.users.read"))
+        .setScopes(Set.of("okta.users.read", "okta.users.manage"))
         .setPrivateKey(getKeyStream())
         .build();
   }
